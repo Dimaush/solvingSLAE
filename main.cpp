@@ -3,7 +3,6 @@
 #include <sstream>
 
 namespace numbers {
-
     unsigned long long gcd(unsigned long long a, unsigned long long b) {
         while (b != 0) {
             a %= b;
@@ -37,7 +36,7 @@ namespace numbers {
             return (numerator == b && denominator == 1);
         }
 
-        RatioSignIn& operator+=(const RatioSignIn other) {
+        RatioSignIn& operator+=(const RatioSignIn& other) {
             long long new_numerator;
             unsigned long long new_denominator;
             new_denominator = lcm(denominator, other.denominator);
@@ -47,12 +46,12 @@ namespace numbers {
             return *this;
         }
 
-        RatioSignIn& operator-=(const RatioSignIn other) {
+        RatioSignIn& operator-=(const RatioSignIn& other) {
             *this += -other;
             return *this;
         }
 
-        RatioSignIn& operator*=(const RatioSignIn other) {
+        RatioSignIn& operator*=(const RatioSignIn& other) {
             long long n1 = numerator, n2 = other.numerator;
             unsigned long long d1 = denominator, d2 = other.denominator;
             reduce(n1, d2);
@@ -61,7 +60,7 @@ namespace numbers {
             return *this;
         }
 
-        RatioSignIn& operator/=(const RatioSignIn other) {
+        RatioSignIn& operator/=(const RatioSignIn& other) {
             *this *= ~other;
             return *this;
         }
@@ -80,8 +79,8 @@ namespace numbers {
                     new_numerator = (long long) denominator;
                     new_denominator = (unsigned long long) numerator;
                 } else {
-                    new_numerator = (long long) -denominator;
-                    new_denominator = (unsigned long long) -numerator;
+                    new_numerator = (long long) (-denominator);
+                    new_denominator = (unsigned long long) (-numerator);
                 }
                 return {new_numerator, new_denominator};
             }
@@ -104,18 +103,73 @@ namespace numbers {
         bool sign;
         unsigned long long numerator, denominator;
 
-        explicit RatioSignOut(unsigned long long n = 0, unsigned long long d = 1, bool s = false) : sign(s) {
-            reduce(n, d);
-            numerator = n, denominator = d;
+        RatioSignOut(unsigned long long n = 0, unsigned long long d = 1, bool s = false) : sign(s) {
+            numerator = n;
+            denominator = d;
+            reduce(numerator, denominator);
         }
 
-        bool operator==(int b) const {
-            return (numerator == b && denominator == 1);
+        RatioSignOut(long long n = 0, unsigned long long d = 1) {
+            sign = (n < 0);
+            numerator = (unsigned long long) (sign ? -n : n);
+            denominator = d;
+            reduce(numerator, denominator);
+        }
+
+        bool operator==(long long b) const {
+            return ( denominator == 1 && (long long) numerator == (sign ? -b : b) );
+        }
+
+        RatioSignIn& operator-=(const RatioSignIn& other) {
+            *this += -other;
+            return *this;
+        }
+
+        RatioSignIn& operator*=(const RatioSignIn& other) {
+            long long n1 = numerator, n2 = other.numerator;
+            unsigned long long d1 = denominator, d2 = other.denominator;
+            reduce(n1, d2);
+            reduce(n2, d1);
+            numerator = n1 * n2, denominator = d1 * d2;
+            return *this;
+        }
+
+        RatioSignIn& operator/=(const RatioSignIn& other) {
+            *this *= ~other;
+            return *this;
+        }
+
+        RatioSignIn operator-() const {
+            return {numerator, denominator, !sign};
+        }
+
+        RatioSignIn operator~() const {
+            if (numerator == 0) {
+                return {0, 1, false};
+            } else {
+                long long new_numerator;
+                unsigned long long new_denominator;
+                if (numerator > 0) {
+                    new_numerator = (long long) denominator;
+                    new_denominator = (unsigned long long) numerator;
+                } else {
+                    new_numerator = (long long) (-denominator);
+                    new_denominator = (unsigned long long) (-numerator);
+                }
+                return {new_numerator, new_denominator};
+            }
         }
 
         static void reduce(unsigned long long& n, unsigned long long& d) {
             unsigned long long g = gcd(n, d);
             n /= g, d /= g;
+        }
+
+        void print() const {
+            std::cout << numerator;
+            if (denominator != 1) {
+                std::cout << "/" << denominator;
+            }
         }
     };
 
@@ -372,7 +426,7 @@ namespace numbers {
             }
         }
 
-        void diag() {
+        void diag() const {
             Ratio coefficient;
             unsigned h;
 
