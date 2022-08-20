@@ -120,13 +120,18 @@ namespace numbers {
             return ( denominator == 1 && (long long) numerator == (sign ? -b : b) );
         }
 
-        RatioSignIn& operator-=(const RatioSignIn& other) {
+        RatioSignOut& operator+=(const RatioSignOut& other) {
+            // ...
+            return *this;
+        }
+
+        RatioSignOut& operator-=(const RatioSignOut& other) {
             *this += -other;
             return *this;
         }
 
-        RatioSignIn& operator*=(const RatioSignIn& other) {
-            long long n1 = numerator, n2 = other.numerator;
+        RatioSignOut& operator*=(const RatioSignOut& other) {
+            unsigned long long n1 = numerator, n2 = other.numerator;
             unsigned long long d1 = denominator, d2 = other.denominator;
             reduce(n1, d2);
             reduce(n2, d1);
@@ -134,29 +139,20 @@ namespace numbers {
             return *this;
         }
 
-        RatioSignIn& operator/=(const RatioSignIn& other) {
+        RatioSignOut& operator/=(const RatioSignOut& other) {
             *this *= ~other;
             return *this;
         }
 
-        RatioSignIn operator-() const {
+        RatioSignOut operator-() const {
             return {numerator, denominator, !sign};
         }
 
-        RatioSignIn operator~() const {
+        RatioSignOut operator~() const {
             if (numerator == 0) {
                 return {0, 1, false};
             } else {
-                long long new_numerator;
-                unsigned long long new_denominator;
-                if (numerator > 0) {
-                    new_numerator = (long long) denominator;
-                    new_denominator = (unsigned long long) numerator;
-                } else {
-                    new_numerator = (long long) (-denominator);
-                    new_denominator = (unsigned long long) (-numerator);
-                }
-                return {new_numerator, new_denominator};
+                return {denominator, numerator, !sign};
             }
         }
 
@@ -178,7 +174,7 @@ namespace numbers {
         static unsigned long long modulus;
         unsigned long long remainder;
 
-        Residue(unsigned long long n = 0) : remainder(n) {}
+        Residue(unsigned long long r = 0) : remainder(r) {}
 
         bool operator==(unsigned long long b) const {
             return (remainder == b % modulus);
@@ -257,6 +253,36 @@ namespace numbers {
         r /= r2;
         return r;
     }
+
+    /*
+    template <class T>
+    T operator+(const T& r1, const T& r2) {
+        T r = r1;
+        r += r2;
+        return r;
+    }
+
+    template <class T>
+    T operator-(const T& r1, const T& r2) {
+        T r = r1;
+        r -= r2;
+        return r;
+    }
+
+    template <class T>
+    T operator*(const T& r1, const T& r2) {
+        T r = r1;
+        r *= r2;
+        return r;
+    }
+
+    template <class T>
+    T operator/(const T& r1, const T& r2) {
+        T r = r1;
+        r /= r2;
+        return r;
+    }
+    */
 
     class RatioVector {
     public:
@@ -426,7 +452,7 @@ namespace numbers {
             }
         }
 
-        void diag() const {
+        void diag() {
             Ratio coefficient;
             unsigned h;
 
